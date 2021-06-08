@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pea/transaction.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,7 +43,6 @@ class MyHomePage extends StatelessWidget {
       ),
       body: Column(
         // ROW/COLUMN Main/Cross Axis
-        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         // <Widget> good practive to label the lists
         children: <Widget>[
@@ -55,6 +55,26 @@ class MyHomePage extends StatelessWidget {
             ),
             elevation: 5, // drop shadow size
           ),
+          Card(
+            elevation: 5,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(children: [
+                TextField(
+                  decoration: InputDecoration(labelText: 'Title'),
+                ),
+                TextField(
+                  decoration: InputDecoration(labelText: 'Amount'),
+                ),
+                TextButton(
+                    onPressed: () {},
+                    child: Text('Add'),
+                    style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all(Colors.pink))),
+              ]),
+            ),
+          ),
           Column(
             // render card widgets using the transaction list
             children: transactions.map((e) {
@@ -62,18 +82,39 @@ class MyHomePage extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      child: Text(e.amount.toString()),
+                      child: Text(
+                        // js string literals
+                        '\$${e.amount}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          color: Colors.pink,
+                        ),
+                      ),
                       // margin and padding, both use EdgeInsets class
                       padding: EdgeInsets.all(10),
                       margin:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 2)),
+                          border: Border.all(color: Colors.pink, width: 2)),
                     ),
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(e.title),
-                        Text(e.date.toIso8601String().toString()),
+                        Text(
+                          e.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          // from intl package
+                          DateFormat.yMEd().add_jm().format(e.date),
+                          style: TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
                       ],
                     ),
                   ],
