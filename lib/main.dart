@@ -26,7 +26,23 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Expenses'),
+        // actions usually house icons
+        // setting up floating action button and icon to open newTransaction modal
+        // flutter provides its own materials for icons Icons.props
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.add),
+          )
+        ],
       ),
+      // Scaffold supports floating action buttons
+      // setting up the floating button
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {},
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       // scroll view gives us scroll functionality
       // to avoid overflows when keyboard pushes the page up when it opens
       // if added on a child widget, it is important to give it height or the scroll won't work properly

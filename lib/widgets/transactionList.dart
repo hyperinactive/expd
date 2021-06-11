@@ -28,7 +28,8 @@ class TransactionList extends StatelessWidget {
                 Container(
                   child: Text(
                     // js string literals
-                    '\$${transactions[index].amount}',
+                    // fixed string limits the number of characters
+                    '\$${transactions[index].amount.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
