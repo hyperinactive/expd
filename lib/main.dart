@@ -12,9 +12,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Expenses App',
+      // Theme Data - global collection of presets
+      // to use the theme, use Theme()
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        // primarySwatch -> based on a singular color but sets up different shades of it
+        // fontFamily from the pubspec file
+        primarySwatch: Colors.pink,
+        accentColor: Colors.amber,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+                headline6: TextStyle(
+              fontFamily: 'OpenSans',
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            )),
+        appBarTheme: AppBarTheme(
+            // copying the light theme of ThemeData's default but replace the title with our font
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  // headline6 == title
+                  headline6: TextStyle(
+                      fontFamily: 'OpenSans',
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                )),
       ),
       home: MyHomePage(),
     );
@@ -30,18 +51,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   var uuid = Uuid();
   final List<Transaction> _userTransactions = [
-    Transaction(
-      id: '1',
-      title: 'Idk',
-      amount: 29.00,
-      date: DateTime.now(), // js thing with timestamps
-    ),
-    Transaction(
-      id: '2',
-      title: 'Idc',
-      amount: 38.10,
-      date: DateTime.now(), // js thing with timestamps
-    ),
+    // Transaction(
+    //   id: '1',
+    //   title: 'Idk',
+    //   amount: 29.00,
+    //   date: DateTime.now(), // js thing with timestamps
+    // ),
+    // Transaction(
+    //   id: '2',
+    //   title: 'Idc',
+    //   amount: 38.10,
+    //   date: DateTime.now(), // js thing with timestamps
+    // ),
   ];
 
   void _addTransaction(String title, double amount) {
@@ -83,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Expenses'),
+        title: Text('Expenses App'),
         // actions usually house icons
         // setting up floating action button and icon to open newTransaction modal
         // flutter provides its own materials for icons Icons.props
@@ -108,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SingleChildScrollView(
         child: Column(
           // ROW/COLUMN Main/Cross Axis
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           // <Widget> good practive to label the lists
           children: <Widget>[
             Card(
