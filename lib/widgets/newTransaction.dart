@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 
-class NewTransaction extends StatelessWidget {
+class NewTransaction extends StatefulWidget {
   // even though the widget is stateless, input doesn't need to render any widget so it's fine like this
   // normally you'd want stateful widget for it anyway
   // String titleInput;
   // String amountInput;
 
   // alternative - use controllers (listeners more like)
-  final TextEditingController titleInputController = TextEditingController();
-  final TextEditingController amountInputController = TextEditingController();
-
   final Function addTransationFn;
 
   NewTransaction({this.addTransationFn});
 
-  // submit function that will trigger when user inputs both title and amount
+  @override
+  _NewTransactionState createState() => _NewTransactionState();
+}
+
+class _NewTransactionState extends State<NewTransaction> {
+  final TextEditingController titleInputController = TextEditingController();
+
+  final TextEditingController amountInputController = TextEditingController();
+
   void submit() {
     final title = titleInputController.text;
     final amount = double.parse(amountInputController.text);
@@ -24,10 +29,18 @@ class NewTransaction extends StatelessWidget {
       return;
     }
 
-    addTransationFn(
+    // widget.props
+    // normally, stuff from other classes cannot be directly used by another one
+    // but widget and state class are connected and flutter has this widget keyword to help with it
+    // work with the props in the widget class inside the state class
+    widget.addTransationFn(
       title,
       amount,
     );
+
+    // navigators pop method
+    // close the modal after enetering a transaction
+    Navigator.of(context).pop();
   }
 
   @override
