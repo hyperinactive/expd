@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pea/model/transaction.dart';
 import 'package:intl/intl.dart';
+import 'package:pea/widgets/charBar.dart';
 
 class Chart extends StatelessWidget {
   final List<Transaction> recentTransactions;
@@ -34,14 +35,40 @@ class Chart extends StatelessWidget {
     });
   }
 
+  double get getTotalSpending {
+    // fold can transoftm list into another type with certain logic passed to fold
+    // sum starts out at 0 and will be incremented for every item in the list
+    return getGroupedTransactionValues.fold(0.0, (sum, item) {
+      return sum + item['amount'];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(getGroupedTransactionValues);
     return Card(
       elevation: 6,
       margin: EdgeInsets.all(20),
-      child: Row(
-        children: [],
+      // instead of creating a Container with padding just to padd something
+      // can use Padding, a container that does that, basically it doesn't matter but it looks nice
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: getGroupedTransactionValues.map((e) {
+            // return Text('${e['day']} : ${e['amount']}'.substring(0, 1));
+            // A widget that controls how a child of a Row, Column, or Flex flexes
+            return Flexible(
+              fit: FlexFit.tight,
+              child: ChartBar(
+                label: e['day'],
+                spendingAmount: e['amount'],
+                spendingPercentage: getTotalSpending == 0
+                    ? 0.0
+                    : (e['amount'] as double) / getTotalSpending,
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
