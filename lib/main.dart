@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pea/widgets/chart.dart';
 import 'package:pea/widgets/transactionList.dart';
 import 'package:uuid/uuid.dart';
 import './widgets/newTransaction.dart';
@@ -64,6 +65,20 @@ class _MyHomePageState extends State<MyHomePage> {
     //   date: DateTime.now(), // js thing with timestamps
     // ),
   ];
+
+  List<Transaction> get _recentTransactions {
+    // where is the js's equivalent to filter
+    // filter the list of transactions and only use those that happened after the current timestamp -7 days
+    // isAfter method builtin method
+    // iterable error - where will transform the list into an iterable, so a conversion into a list is needed
+    return _userTransactions.where((e) {
+      return e.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
 
   void _addTransaction(String title, double amount) {
     final newTransaction = Transaction(
@@ -135,7 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Card(
               // Cards are only as big as they need to fit the child
               child: Container(
-                child: Text('Chart placeholder'),
+                child: Chart(
+                  recentTransactions: _recentTransactions,
+                ),
                 width: double.infinity,
                 color: Colors.blue,
               ),
