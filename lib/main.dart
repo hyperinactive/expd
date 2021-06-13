@@ -154,7 +154,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   recentTransactions: _recentTransactions,
                 ),
                 width: double.infinity,
-                color: Colors.blue,
               ),
               elevation: 5, // drop shadow size
             ),

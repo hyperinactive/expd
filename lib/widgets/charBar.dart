@@ -12,8 +12,11 @@ class ChartBar extends StatelessWidget {
     return Column(
       children: [
         // fitted box forces its child into the available space
-        FittedBox(
-          child: Text('\$${spendingAmount.toStringAsFixed(0)}'),
+        Container(
+          height: 20,
+          child: FittedBox(
+            child: Text('\$${spendingAmount.toStringAsFixed(0)}'),
+          ),
         ),
         SizedBox(
           height: 4,
@@ -40,6 +43,7 @@ class ChartBar extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
