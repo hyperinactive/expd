@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
                       fontFamily: 'OpenSans',
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
+                  button: TextStyle(color: Colors.white),
                 )),
       ),
       home: MyHomePage(),
@@ -80,12 +81,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }).toList();
   }
 
-  void _addTransaction(String title, double amount) {
+  void _addTransaction(String title, double amount, DateTime date) {
     final newTransaction = Transaction(
       id: uuid.v4(),
       title: title,
       amount: amount,
-      date: DateTime.now(),
+      date: date,
     );
 
     setState(() {
@@ -108,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
           onTap: () {},
           behavior: HitTestBehavior.opaque,
           child: NewTransaction(
-            addTransationFn: _addTransaction,
+            addTransactionCallback: _addTransaction,
           ),
         );
       },
