@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:pea/widgets/chart.dart';
-import 'package:pea/widgets/transactionList.dart';
 import 'package:uuid/uuid.dart';
+
+import './style/themeData.dart';
+import './widgets/chart.dart';
+import './widgets/transactionList.dart';
 import './widgets/newTransaction.dart';
 import './model/transaction.dart';
 
@@ -16,29 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'Expenses App',
       // Theme Data - global collection of presets
       // to use the theme, use Theme()
-      theme: ThemeData(
-        // primarySwatch -> based on a singular color but sets up different shades of it
-        // fontFamily from the pubspec file
-        primarySwatch: Colors.pink,
-        accentColor: Colors.amber,
-        fontFamily: 'Quicksand',
-        textTheme: ThemeData.light().textTheme.copyWith(
-                headline6: TextStyle(
-              fontFamily: 'OpenSans',
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            )),
-        appBarTheme: AppBarTheme(
-            // copying the light theme of ThemeData's default but replace the title with our font
-            textTheme: ThemeData.light().textTheme.copyWith(
-                  // headline6 == title
-                  headline6: TextStyle(
-                      fontFamily: 'OpenSans',
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                  button: TextStyle(color: Colors.white),
-                )),
-      ),
+      theme: MyThemeData().themeData,
       home: MyHomePage(),
     );
   }
@@ -91,6 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       _userTransactions.add(newTransaction);
+    });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((element) => element.id == id);
     });
   }
 
@@ -160,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TransactionList(
               transactions: _userTransactions,
+              deleteTransaction: _deleteTransaction,
             ),
           ],
         ),
