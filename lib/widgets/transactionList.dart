@@ -11,7 +11,8 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      // hard-coded, % based height/width would be optimal
+      // height: 450, has to be connected to the context
       // Column + SingleChildScrollView == ListView widget
       // still needs height though
 
@@ -22,25 +23,29 @@ class TransactionList extends StatelessWidget {
       // it needs an itemBuilder, a function given by flutter, gives a context and index
       // index tells the currently rendered item
       child: transactions.isEmpty
-          ? Column(
-              children: [
-                Text(
-                  'No Transactions added yet',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                // commonly used as separators, occupies spaces, doesn't need a child
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  height: 200,
-                  child: Image.asset(
-                    'assets/images/waiting.png',
-                    fit: BoxFit.cover,
+          // constraints are super useful
+          // finding out the height of the parent widget is super useful
+          ? LayoutBuilder(builder: (context, constraints) {
+              return Column(
+                children: [
+                  Text(
+                    'No Transactions added yet',
+                    style: Theme.of(context).textTheme.headline6,
                   ),
-                ),
-              ],
-            )
+                  // commonly used as separators, occupies spaces, doesn't need a child
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    height: constraints.maxHeight * 0.6,
+                    child: Image.asset(
+                      'assets/images/waiting.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              );
+            })
           : ListView.builder(
               itemBuilder: (context, index) {
                 // return Card(

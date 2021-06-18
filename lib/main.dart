@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import './style/themeData.dart';
@@ -8,6 +9,15 @@ import './widgets/newTransaction.dart';
 import './model/transaction.dart';
 
 void main() {
+  // uncomment if landscape mode isn't meant to be supported
+  // // inits the bindings if necessary (for some devices)
+  // WidgetsFlutterBinding.ensureInitialized();
+  // // SystemChrome sets the system-wide settings for the app
+  // // code down will lock the app into a portrait mode
+  // SystemChrome.setPreferredOrientations([
+  //   DeviceOrientation.portraitUp,
+  //   DeviceOrientation.portraitDown,
+  // ]);
   runApp(MyApp());
 }
 
@@ -46,6 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
     //   date: DateTime.now(), // js thing with timestamps
     // ),
   ];
+
+  bool _showCharts = false;
 
   List<Transaction> get _recentTransactions {
     // where is the js's equivalent to filter
@@ -104,19 +116,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Expenses App'),
-        // actions usually house icons
-        // setting up floating action button and icon to open newTransaction modal
-        // flutter provides its own materials for icons Icons.props
-        actions: [
-          IconButton(
-            onPressed: () => _showNewTransactionModal(context),
-            icon: Icon(Icons.add),
-          )
-        ],
+    // bool run on every render which checks if the app is in landscape mode
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    // storing it like this so I can tell the height of the appBar
+    final appBar = AppBar(
+      title: Text('Expenses App'),
+      // actions usually house icons
+      // setting up floating action button and icon to open newTransaction modal
+      // flutter provides its own materials for icons Icons.props
+      actions: [
+        IconButton(
+          onPressed: () => _showNewTransactionModal(context),
+          icon: Icon(Icons.add),
+        )
+      ],
+    );
+
+    final transactionList = Container(
+      // MediaQuery == @media
+      // size gets the device's height and width => 60%
+      // subtract padding of the status bar
+      // padding.top - get the top padding info
+      height: (MediaQuery.of(context).size.height -
+              MediaQuery.of(context).padding.top -
+              appBar.preferredSize.height) *
+          0.7,
+      child: TransactionList(
+        transactions: _userTransactions,
+        deleteTransaction: _deleteTransaction,
       ),
+    );
+    return Scaffold(
+      appBar: appBar,
       // Scaffold supports floating action buttons
       // setting up the floating button
       floatingActionButton: FloatingActionButton(
@@ -134,20 +167,53 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           // <Widget> good practive to label the lists
           children: <Widget>[
-            Card(
-              // Cards are only as big as they need to fit the child
-              child: Container(
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Show expenses chart'),
+                  // on off slider widget
+                  Switch(
+                    value: _showCharts,
+                    onChanged: (e) {
+                      setState(() {
+                        _showCharts = e;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            // Cards are only as big as they need to fit the child
+            // prefferedSize contains the size of a widget
+            // subrtractingn the height of the chart container and appBar * 0.4
+
+            // if not in the landscape mode show the smaller chart and transaction list
+            // else show the switch that controls the large chart/transaction list
+            if (!isLandscape)
+              Container(
+                height: (MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        appBar.preferredSize.height) *
+                    0.3,
                 child: Chart(
                   recentTransactions: _recentTransactions,
                 ),
-                width: double.infinity,
+                // width: double.infinity,
               ),
-              elevation: 5, // drop shadow size
-            ),
-            TransactionList(
-              transactions: _userTransactions,
-              deleteTransaction: _deleteTransaction,
-            ),
+            if (!isLandscape) transactionList,
+            if (isLandscape)
+              _showCharts
+                  ? Container(
+                      height: (MediaQuery.of(context).size.height -
+                              MediaQuery.of(context).padding.top -
+                              appBar.preferredSize.height) *
+                          0.7,
+                      child: Chart(
+                        recentTransactions: _recentTransactions,
+                      ),
+                      // width: double.infinity,
+                    )
+                  : transactionList
           ],
         ),
       ),
