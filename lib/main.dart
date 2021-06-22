@@ -1,8 +1,12 @@
+// will tell what platform the code is running on
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
-import './style/themeData.dart';
+import 'style/androidThemeData.dart';
 import './widgets/chart.dart';
 import './widgets/transactionList.dart';
 import './widgets/newTransaction.dart';
@@ -28,7 +32,7 @@ class MyApp extends StatelessWidget {
       title: 'Expenses App',
       // Theme Data - global collection of presets
       // to use the theme, use Theme()
-      theme: MyThemeData().themeData,
+      theme: AndroidThemeData().themeData,
       home: MyHomePage(),
     );
   }
@@ -116,31 +120,48 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // our context's media query object
+    // better to create if once like this than to call media query on our cotext multiple times in the code
+    final mediaQuery = MediaQuery.of(context);
     // bool run on every render which checks if the app is in landscape mode
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
 
     // storing it like this so I can tell the height of the appBar
-    final appBar = AppBar(
-      title: Text('Expenses App'),
-      // actions usually house icons
-      // setting up floating action button and icon to open newTransaction modal
-      // flutter provides its own materials for icons Icons.props
-      actions: [
-        IconButton(
-          onPressed: () => _showNewTransactionModal(context),
-          icon: Icon(Icons.add),
-        )
-      ],
-    );
+    // gets rid of the warning messages regarding the preferredSize
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text('Personal Expenses'),
+            trailing: Row(
+              // take the minimum size the children need
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: () => _showNewTransactionModal(context),
+                  child: Icon(CupertinoIcons.add),
+                ),
+              ],
+            ),
+          )
+        : AppBar(
+            title: Text('Expenses App'),
+            // actions usually house icons
+            // setting up floating action button and icon to open newTransaction modal
+            // flutter provides its own materials for icons Icons.props
+            actions: [
+              IconButton(
+                onPressed: () => _showNewTransactionModal(context),
+                icon: Icon(Icons.add),
+              )
+            ],
+          );
 
     final transactionList = Container(
       // MediaQuery == @media
       // size gets the device's height and width => 60%
       // subtract padding of the status bar
       // padding.top - get the top padding info
-      height: (MediaQuery.of(context).size.height -
-              MediaQuery.of(context).padding.top -
+      height: (mediaQuery.size.height -
+              mediaQuery.padding.top -
               appBar.preferredSize.height) *
           0.7,
       child: TransactionList(
@@ -148,75 +169,94 @@ class _MyHomePageState extends State<MyHomePage> {
         deleteTransaction: _deleteTransaction,
       ),
     );
-    return Scaffold(
-      appBar: appBar,
-      // Scaffold supports floating action buttons
-      // setting up the floating button
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        // providing the build context to our modal function
-        onPressed: () => _showNewTransactionModal(context),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      // scroll view gives us scroll functionality
-      // to avoid overflows when keyboard pushes the page up when it opens
-      // if added on a child widget, it is important to give it height or the scroll won't work properly
-      body: SingleChildScrollView(
-        child: Column(
-          // ROW/COLUMN Main/Cross Axis
-          crossAxisAlignment: CrossAxisAlignment.center,
-          // <Widget> good practive to label the lists
-          children: <Widget>[
-            if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Show expenses chart'),
-                  // on off slider widget
-                  Switch(
-                    value: _showCharts,
-                    onChanged: (e) {
-                      setState(() {
-                        _showCharts = e;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            // Cards are only as big as they need to fit the child
-            // prefferedSize contains the size of a widget
-            // subrtractingn the height of the chart container and appBar * 0.4
 
-            // if not in the landscape mode show the smaller chart and transaction list
-            // else show the switch that controls the large chart/transaction list
-            if (!isLandscape)
-              Container(
-                height: (MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.top -
-                        appBar.preferredSize.height) *
-                    0.3,
-                child: Chart(
-                  recentTransactions: _recentTransactions,
+    // SafeArea makes sure to stay outside the reserved areas of the device
+    final appBody = SafeArea(
+        child: SingleChildScrollView(
+      child: Column(
+        // ROW/COLUMN Main/Cross Axis
+        crossAxisAlignment: CrossAxisAlignment.center,
+        // <Widget> good practive to label the lists
+        children: <Widget>[
+          if (isLandscape)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Show expenses chart',
+                  style: Theme.of(context).textTheme.headline6,
                 ),
-                // width: double.infinity,
+                // on off slider widget
+                // .adaptive changes the loop automatically based on platform
+                Switch.adaptive(
+                  activeColor: Theme.of(context).accentColor,
+                  value: _showCharts,
+                  onChanged: (e) {
+                    setState(() {
+                      _showCharts = e;
+                    });
+                  },
+                ),
+              ],
+            ),
+          // Cards are only as big as they need to fit the child
+          // prefferedSize contains the size of a widget
+          // subrtractingn the height of the chart container and appBar * 0.4
+
+          // if not in the landscape mode show the smaller chart and transaction list
+          // else show the switch that controls the large chart/transaction list
+          if (!isLandscape)
+            Container(
+              height: (mediaQuery.size.height -
+                      mediaQuery.padding.top -
+                      appBar.preferredSize.height) *
+                  0.3,
+              child: Chart(
+                recentTransactions: _recentTransactions,
               ),
-            if (!isLandscape) transactionList,
-            if (isLandscape)
-              _showCharts
-                  ? Container(
-                      height: (MediaQuery.of(context).size.height -
-                              MediaQuery.of(context).padding.top -
-                              appBar.preferredSize.height) *
-                          0.7,
-                      child: Chart(
-                        recentTransactions: _recentTransactions,
-                      ),
-                      // width: double.infinity,
-                    )
-                  : transactionList
-          ],
-        ),
+              // width: double.infinity,
+            ),
+          if (!isLandscape) transactionList,
+          if (isLandscape)
+            _showCharts
+                ? Container(
+                    height: (mediaQuery.size.height -
+                            mediaQuery.padding.top -
+                            appBar.preferredSize.height) *
+                        0.7,
+                    child: Chart(
+                      recentTransactions: _recentTransactions,
+                    ),
+                    // width: double.infinity,
+                  )
+                : transactionList
+        ],
       ),
-    );
+    ));
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: appBody,
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            // Scaffold supports floating action buttons
+            // setting up the floating button
+            // check the platform and render the button if the device isn't IOS
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    // providing the build context to our modal function
+                    onPressed: () => _showNewTransactionModal(context),
+                  ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            // scroll view gives us scroll functionality
+            // to avoid overflows when keyboard pushes the page up when it opens
+            // if added on a child widget, it is important to give it height or the scroll won't work properly
+            body: appBody,
+          );
   }
 }

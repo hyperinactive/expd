@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MyThemeData {
+class AndroidThemeData {
   final themeData = ThemeData(
     // primarySwatch -> based on a singular color but sets up different shades of it
     // fontFamily from the pubspec file

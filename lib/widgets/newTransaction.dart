@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pea/widgets/adaptiveButton.dart';
 
 class NewTransaction extends StatefulWidget {
   // even though the widget is stateless, input doesn't need to render any widget so it's fine like this
@@ -77,68 +80,73 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        child: Column(children: [
-          // text field for the title of a transaction
-          TextField(
-            // onChanged: (value) {
-            //   titleInput = value;
-            // },
-            controller: _titleInputController,
-            decoration: InputDecoration(labelText: 'Title'),
-            onSubmitted: (_) => _submit(),
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Container(
+          padding: EdgeInsets.only(
+            top: 10,
+            left: 10,
+            right: 10,
+            // will read out the insets on the bottom, and add 10px to it if it overlaps with input
+            bottom: MediaQuery.of(context).viewInsets.bottom + 10,
           ),
-          // text field for the amount
-          // only allow numbers -> keyboardType -> TextInputType.number
-          TextField(
-            // onChanged: (value) {
-            //   amountInput = value;
-            // },
-            controller: _amountInputController,
-            decoration: InputDecoration(labelText: 'Amount'),
-            keyboardType: TextInputType.number,
-            // _ meaning, whatever, idc about the arg here
-            // normally, it would not let a void function be here without args
-            onSubmitted: (_) => _submit(),
-          ),
-          Container(
-            height: 70,
-            child: Row(
-              children: [
-                // if no date is chosen, render the text else render the date
-                Expanded(
-                  child: Text(
-                    _selectedDate == null
-                        ? 'Date not chosen'
-                        : 'Date: ${DateFormat.yMd().format(_selectedDate)}',
-                  ),
-                ),
-                TextButton(
-                  onPressed: _showDatePicker,
-                  child: Text(
-                    'Choose Date',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
+          child: Column(children: [
+            // text field for the title of a transaction
+            TextField(
+              // onChanged: (value) {
+              //   titleInput = value;
+              // },
+              controller: _titleInputController,
+              decoration: InputDecoration(labelText: 'Title'),
+              onSubmitted: (_) => _submit(),
             ),
-          ),
-          ElevatedButton(
-            // onPressed: () {
-            //   // controller.text will give the value of it
-            //   addTransationFn(
-            //       titleInputController.text,
-            //       // parsing to double from string!
-            //       double.parse(amountInputController.text));
-            // submit stuff on press
-            // },
-            onPressed: _submit,
-            child: Text('Add'),
-          ),
-        ]),
+            // text field for the amount
+            // only allow numbers -> keyboardType -> TextInputType.number
+            TextField(
+              // onChanged: (value) {
+              //   amountInput = value;
+              // },
+              controller: _amountInputController,
+              decoration: InputDecoration(labelText: 'Amount'),
+              keyboardType: TextInputType.number,
+              // _ meaning, whatever, idc about the arg here
+              // normally, it would not let a void function be here without args
+              onSubmitted: (_) => _submit(),
+            ),
+            Container(
+              height: 70,
+              child: Row(
+                children: [
+                  // if no date is chosen, render the text else render the date
+                  Expanded(
+                    child: Text(
+                      _selectedDate == null
+                          ? 'Date not chosen'
+                          : 'Date: ${DateFormat.yMd().format(_selectedDate)}',
+                    ),
+                  ),
+                  AdaptiveButton(
+                    callback: _showDatePicker,
+                    text: 'Choose Date',
+                  )
+                ],
+              ),
+            ),
+            ElevatedButton(
+              // onPressed: () {
+              //   // controller.text will give the value of it
+              //   addTransationFn(
+              //       titleInputController.text,
+              //       // parsing to double from string!
+              //       double.parse(amountInputController.text));
+              // submit stuff on press
+              // },
+              onPressed: _submit,
+              child: Text('Add'),
+            ),
+          ]),
+        ),
       ),
     );
   }

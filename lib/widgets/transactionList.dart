@@ -121,13 +121,21 @@ class TransactionList extends StatelessWidget {
                       DateFormat.yMMMd().format(transactions[index].date),
                     ),
                     // trailing is located at the end of the tile
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () =>
-                          // getting the index from the list builder
-                          deleteTransaction(transactions[index].id),
-                    ),
+                    // if the width if greated than 460 (should be the case for bigger devices or devices in landscape mode)
+                    trailing: MediaQuery.of(context).size.width > 460
+                        ? TextButton.icon(
+                            onPressed: () =>
+                                {deleteTransaction(transactions[index].id)},
+                            icon: Icon(Icons.delete),
+                            label: Text('Delete'),
+                          )
+                        : IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Theme.of(context).errorColor,
+                            onPressed: () =>
+                                // getting the index from the list builder
+                                deleteTransaction(transactions[index].id),
+                          ),
                   ),
                 );
               },
