@@ -46,16 +46,17 @@ class TransactionList extends StatelessWidget {
                 ],
               );
             })
-          : ListView.builder(
-              itemBuilder: (context, index) {
-                // builtin class in flutter, looks nice
-                // for each index of the itemBuilder return a TransactionCard
-                return TransactionCard(
-                    transaction: transactions[index],
-                    deleteTransaction: deleteTransaction);
-              },
-              itemCount: transactions.length,
-              // render card widgets using the transaction list
+          : ListView(
+              children: [
+                // render card widgets using the transaction list
+                // keys ensure state refs won't pointing to wrong elements
+                ...transactions
+                    .map((e) => TransactionCard(
+                        key: ValueKey(e.id),
+                        transaction: e,
+                        deleteTransaction: deleteTransaction))
+                    .toList()
+              ],
             ),
     );
   }

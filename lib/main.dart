@@ -43,22 +43,36 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+// mixin - can extend some properties of another class
+// with keyword for it
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   var uuid = Uuid();
-  final List<Transaction> _userTransactions = [
-    // Transaction(
-    //   id: '1',
-    //   title: 'Idk',
-    //   amount: 29.00,
-    //   date: DateTime.now(), // js thing with timestamps
-    // ),
-    // Transaction(
-    //   id: '2',
-    //   title: 'Idc',
-    //   amount: 38.10,
-    //   date: DateTime.now(), // js thing with timestamps
-    // ),
-  ];
+  final List<Transaction> _userTransactions = [];
+
+  // add an observer when state gets created
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  // Called when the system puts the app in the background or returns the app to the foreground.
+  // adding listeners to tell when state changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+    // homescreen (o) -> paused
+    // task manager ([]) -> inactive -> paused
+    // task manager into the app -> resumed
+    // task manager clear -> suspend? (doesn't always get reached)
+  }
+
+  // close the listeners
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   bool _showCharts = false;
 
@@ -95,6 +109,98 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // clean code, custom build methods to render stuff based on some parameters
+  // isLandscape in my case
+  List<Widget> _buildLandscapeContent(
+      MediaQueryData mediaQuery, AppBar appBar, Widget transactionList) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Show expenses chart',
+            style: Theme.of(context).textTheme.headline6,
+          ),
+          // on off slider widget
+          // .adaptive changes the loop automatically based on platform
+          Switch.adaptive(
+            activeColor: Theme.of(context).accentColor,
+            value: _showCharts,
+            onChanged: (e) {
+              setState(() {
+                _showCharts = e;
+              });
+            },
+          ),
+        ],
+      ),
+      _showCharts
+          ? Container(
+              height: (mediaQuery.size.height -
+                      mediaQuery.padding.top -
+                      appBar.preferredSize.height) *
+                  0.7,
+              child: Chart(
+                recentTransactions: _recentTransactions,
+              ),
+              // width: double.infinity,
+            )
+          : transactionList
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(
+      MediaQueryData mediaQuery, AppBar appBar, Widget transactionList) {
+    return [
+      Container(
+        height: (mediaQuery.size.height -
+                mediaQuery.padding.top -
+                appBar.preferredSize.height) *
+            0.3,
+        child: Chart(
+          recentTransactions: _recentTransactions,
+        ),
+        // width: double.infinity,
+      ),
+      transactionList
+    ];
+  }
+
+  Widget _buildCupertinoNavBar() {
+    return CupertinoNavigationBar(
+      middle: const Text('Personal Expenses'),
+      trailing: Row(
+        // take the minimum size the children need
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: () => _showNewTransactionModal(context),
+            child: const Icon(CupertinoIcons.add),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaterialAppBar() {
+    return AppBar(
+      title: const Text('Expenses App'),
+      // actions usually house icons
+      // setting up floating action button and icon to open newTransaction modal
+      // flutter provides its own materials for icons Icons.props
+      actions: [
+        IconButton(
+          onPressed: () => _showNewTransactionModal(context),
+          icon: const Icon(Icons.add),
+        )
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return Platform.isIOS ? _buildCupertinoNavBar() : _buildMaterialAppBar();
+  }
+
   void _showNewTransactionModal(BuildContext context) {
     // requires a context which we provide in our function
     // note that this context is different from the one the builder needs
@@ -127,32 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // storing it like this so I can tell the height of the appBar
     // gets rid of the warning messages regarding the preferredSize
-    final PreferredSizeWidget appBar = Platform.isIOS
-        ? CupertinoNavigationBar(
-            middle: const Text('Personal Expenses'),
-            trailing: Row(
-              // take the minimum size the children need
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () => _showNewTransactionModal(context),
-                  child: const Icon(CupertinoIcons.add),
-                ),
-              ],
-            ),
-          )
-        : AppBar(
-            title: const Text('Expenses App'),
-            // actions usually house icons
-            // setting up floating action button and icon to open newTransaction modal
-            // flutter provides its own materials for icons Icons.props
-            actions: [
-              IconButton(
-                onPressed: () => _showNewTransactionModal(context),
-                icon: const Icon(Icons.add),
-              )
-            ],
-          );
+    final PreferredSizeWidget appBar = _buildAppBar();
 
     final transactionList = Container(
       // MediaQuery == @media
@@ -178,26 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // <Widget> good practive to label the lists
         children: <Widget>[
           if (isLandscape)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Show expenses chart',
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                // on off slider widget
-                // .adaptive changes the loop automatically based on platform
-                Switch.adaptive(
-                  activeColor: Theme.of(context).accentColor,
-                  value: _showCharts,
-                  onChanged: (e) {
-                    setState(() {
-                      _showCharts = e;
-                    });
-                  },
-                ),
-              ],
-            ),
+            ..._buildLandscapeContent(mediaQuery, appBar, transactionList),
           // Cards are only as big as they need to fit the child
           // prefferedSize contains the size of a widget
           // subrtractingn the height of the chart container and appBar * 0.4
@@ -205,30 +267,9 @@ class _MyHomePageState extends State<MyHomePage> {
           // if not in the landscape mode show the smaller chart and transaction list
           // else show the switch that controls the large chart/transaction list
           if (!isLandscape)
-            Container(
-              height: (mediaQuery.size.height -
-                      mediaQuery.padding.top -
-                      appBar.preferredSize.height) *
-                  0.3,
-              child: Chart(
-                recentTransactions: _recentTransactions,
-              ),
-              // width: double.infinity,
-            ),
-          if (!isLandscape) transactionList,
-          if (isLandscape)
-            _showCharts
-                ? Container(
-                    height: (mediaQuery.size.height -
-                            mediaQuery.padding.top -
-                            appBar.preferredSize.height) *
-                        0.7,
-                    child: Chart(
-                      recentTransactions: _recentTransactions,
-                    ),
-                    // width: double.infinity,
-                  )
-                : transactionList
+            // js spread operator shenanigans
+            // no longer a list, but extracted individual elements
+            ..._buildPortraitContent(mediaQuery, appBar, transactionList),
         ],
       ),
     ));

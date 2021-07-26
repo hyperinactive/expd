@@ -12,16 +12,58 @@ class NewTransaction extends StatefulWidget {
   // alternative - use controllers (listeners more like)
   final Function addTransactionCallback;
 
-  NewTransaction({this.addTransactionCallback});
+  NewTransaction({this.addTransactionCallback}) {
+    print('constructor new transaction widget');
+  }
 
   @override
-  _NewTransactionState createState() => _NewTransactionState();
+  _NewTransactionState createState() {
+    print('create state');
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
   final TextEditingController _titleInputController = TextEditingController();
   final TextEditingController _amountInputController = TextEditingController();
   DateTime _selectedDate;
+
+  _NewTransactionState() {
+    print('constructor inside the state');
+  }
+
+  @override
+  void initState() {
+    print('initState');
+    // super is the base State constuctor
+    super.initState();
+  }
+
+  // lifecycle method
+  @override
+  void didUpdateWidget(covariant NewTransaction oldWidget) {
+    print('didUpdateWidget');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    print('dispose');
+    super.dispose();
+  }
+  // State doesn't get autorebuilt because if just holds a ref of the element that manages the state
+  // and is just updated to point to the new widget
+  // Lifecycle goes like this:
+
+  // widget constructor
+  // createState (if widget updated it doesn't automatically get called (is rebuilt))
+  // state constructor (if widget updated it doesn't automatically get called (is rebuilt))
+  // initState (if widget updated it doesn't automatically get called (is rebuilt))
+  // dispose
+
+  // initState usually used to fetch data
+  // didUpdate usually used when parent changes and data needs refetching
+  // dispose cleans up connections to server or memory leaks
 
   void _submit() {
     if (_titleInputController.text.isEmpty ||
