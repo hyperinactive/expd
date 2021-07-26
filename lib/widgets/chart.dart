@@ -47,11 +47,11 @@ class Chart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 6,
-      margin: EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
       // instead of creating a Container with padding just to padd something
       // can use Padding, a container that does that, basically it doesn't matter but it looks nice
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: getGroupedTransactionValues.map((e) {

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -108,7 +107,7 @@ class _NewTransactionState extends State<NewTransaction> {
               //   amountInput = value;
               // },
               controller: _amountInputController,
-              decoration: InputDecoration(labelText: 'Amount'),
+              decoration: const InputDecoration(labelText: 'Amount'),
               keyboardType: TextInputType.number,
               // _ meaning, whatever, idc about the arg here
               // normally, it would not let a void function be here without args
@@ -143,7 +142,7 @@ class _NewTransactionState extends State<NewTransaction> {
               // submit stuff on press
               // },
               onPressed: _submit,
-              child: Text('Add'),
+              child: const Text('Add'),
             ),
           ]),
         ),

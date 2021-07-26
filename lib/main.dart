@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 import 'style/androidThemeData.dart';
@@ -71,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return _userTransactions.where((e) {
       return e.date.isAfter(
         DateTime.now().subtract(
-          Duration(days: 7),
+          const Duration(days: 7),
         ),
       );
     }).toList();
@@ -130,27 +129,27 @@ class _MyHomePageState extends State<MyHomePage> {
     // gets rid of the warning messages regarding the preferredSize
     final PreferredSizeWidget appBar = Platform.isIOS
         ? CupertinoNavigationBar(
-            middle: Text('Personal Expenses'),
+            middle: const Text('Personal Expenses'),
             trailing: Row(
               // take the minimum size the children need
               mainAxisSize: MainAxisSize.min,
               children: [
                 GestureDetector(
                   onTap: () => _showNewTransactionModal(context),
-                  child: Icon(CupertinoIcons.add),
+                  child: const Icon(CupertinoIcons.add),
                 ),
               ],
             ),
           )
         : AppBar(
-            title: Text('Expenses App'),
+            title: const Text('Expenses App'),
             // actions usually house icons
             // setting up floating action button and icon to open newTransaction modal
             // flutter provides its own materials for icons Icons.props
             actions: [
               IconButton(
                 onPressed: () => _showNewTransactionModal(context),
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
               )
             ],
           );
@@ -247,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
             floatingActionButton: Platform.isIOS
                 ? Container()
                 : FloatingActionButton(
-                    child: Icon(Icons.add),
+                    child: const Icon(Icons.add),
                     // providing the build context to our modal function
                     onPressed: () => _showNewTransactionModal(context),
                   ),
